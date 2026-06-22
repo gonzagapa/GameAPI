@@ -1,1 +1,15 @@
 GET http://localhost:5202/games
+
+### 
+GET http://localhost:5202/games/4
+
+###
+POST http://localhost:5202/games
+Content-Type: application/json 
+
+{
+    "name":"GTA 5",
+    "genre":"Action",
+    "price":20.00,
+    "releaseDate":"2023-10-20"
+}
