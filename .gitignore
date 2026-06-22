@@ -1,0 +1,61 @@
+## Ignore Visual Studio/Dotnet temporary files, build results, and IDE settings
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.user-rgt
+*.userosscache
+*.sln.docstates
+
+# User-specific files (MonoDevelop/Xamarin Studio)
+*.userprefs
+
+# Mono auto generated files
+*.pidb
+*.resources.dll
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Log]/
+[Ll]og/
+
+# Visual Studio cache directory
+.vs/
+
+# MSTest test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# NUnit
+*.VisualState.xml
+TestResult.xml
+nunit-*.xml
+
+# Rider / IntelliJ settings
+.idea/
+*.sln.iml
+*.user.iml
+
+# Visual Studio Code settings
+.vscode/
+
+# Node/npm (if any front-end elements are added later)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Local app settings files
+appsettings.local.json
+/GameStore/bin/
+/GameStore/obj/
