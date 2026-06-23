@@ -12,4 +12,19 @@ Content-Type: application/json
     "genre":"Action",
     "price":20.00,
     "releaseDate":"2023-10-20"
-}
+} 
+
+###
+PUT http://localhost:5202/games/4 
+Content-Type: application/json 
+
+{
+    "name":"GTA 5",
+    "genre":"Action",
+    "price":50.00,
+    "releaseDate":"2023-10-20"
+} 
+
+### 
+DELETE http://localhost:5202/games/4 
+Content-Type: application/json 
