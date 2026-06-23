@@ -8,7 +8,7 @@ POST http://localhost:5202/games
 Content-Type: application/json 
 
 {
-    "name":"GTA 5",
+    "name":"Hola",
     "genre":"Action",
     "price":20.00,
     "releaseDate":"2023-10-20"
