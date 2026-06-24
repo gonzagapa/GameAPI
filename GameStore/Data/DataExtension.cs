@@ -19,6 +19,9 @@ public static class DataExtension
     public static void AddGameStoreDB(this WebApplicationBuilder builder)
     {
         var connString = builder.Configuration.GetConnectionString("GameStore");
+
+        //Here we register our DBContext to the IServiceProvider container with Scoped lifetime
+        //Why?: To prevent memory leaks, Db connections are expensive resource, isnt thread-safe and avoid concurrency issues.
         builder.Services.AddSqlite<GameStoreContext>(connString, optionsAction:options => options.UseSeeding((context, _) =>
         {
             if (!context.Set<Genre>().Any())

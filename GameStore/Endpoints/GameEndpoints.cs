@@ -1,4 +1,6 @@
+using GameStore.Data;
 using GameStore.Dtos;
+using GameStore.Models;
 
 namespace GameStore.Endpoints;
 
@@ -18,7 +20,10 @@ public static class GameEndpoints
             var group = app.MapGroup("/games");
 
             //GET /games
-            group.MapGet("/", () => games);
+            group.MapGet("/", () =>
+            {
+                
+            });
 
 
             // GET /games/{id} 
@@ -31,12 +36,23 @@ public static class GameEndpoints
             }).WithName(GetGameEndpointName);
 
             // POST /games
-            group.MapPost("/",(CreateGameDto newGame) =>
+            group.MapPost("/",(CreateGameDto newGame, GameStoreContext dbContext) =>
             {
-            GameDto game = new(games.Count +1, newGame.Name, newGame.Genre, newGame.Price, newGame.ReleaseDate); 
-            games.Add(game);
+                Game game = new()
+                {
+                    Name = newGame.Name,
+                    GenreId = newGame.GenreId,
+                    Price = newGame.Price,
+                    ReleaseDate = newGame.ReleaseDate
+                } ;
 
-            return Results.CreatedAtRoute(GetGameEndpointName, new {id = game.Id},game);
+                dbContext.Games.Add(game);
+                dbContext.SaveChanges(); 
+
+                GameDetailsDto gameDetails = new(game.Name,game.GenreId,game.Price, game.ReleaseDate);
+
+                //NEVER EXPOSE THE INTERNAL DETAILS to clients, return the DTO
+                return Results.CreatedAtRoute(GetGameEndpointName, new {id = game.Id},gameDetails);
             });
 
             // PUT /games/{id}

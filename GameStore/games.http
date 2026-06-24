@@ -9,7 +9,7 @@ Content-Type: application/json
 
 {
     "name":"Hola",
-    "genre":"Action",
+    "genreId":3,
     "price":20.00,
     "releaseDate":"2023-10-20"
 } 
@@ -20,7 +20,7 @@ Content-Type: application/json
 
 {
     "name":"GTA 5",
-    "genre":"Action",
+    "genreId":3,
     "price":50.00,
     "releaseDate":"2023-10-20"
 } 
