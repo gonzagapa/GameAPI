@@ -1,3 +1,4 @@
+using GameStore;
 using GameStore.Data;
 using GameStore.Endpoints;
 
@@ -11,4 +12,5 @@ builder.Services.AddSqlite<GameStoreContext>(connString);
 
 var app = builder.Build();
 app.MapGamesEndpoints();
+app.MigrateDB();
 app.Run();
