@@ -8,11 +8,6 @@ namespace GameStore.Endpoints;
 public static class GameEndpoints
 {
     const string GetGameEndpointName = "GetGame";
-    // static readonly List<GameDto> games = [
-    //     new (1,"Street Figher II", "Fighting", 19.99M,new DateOnly(1992,7,15)),
-    //     new (2, "Final Fantasy VII", "RPG", 69.99M, new DateOnly(2024,2,29)), 
-    //     new(3, "Astro Bot","Fantasy", 50.00M, new DateOnly(2000,1,30))  
-    // ];
 
     //WebApplication is the object to be extended
     public static void MapGamesEndpoints(this WebApplication app)
@@ -23,7 +18,14 @@ public static class GameEndpoints
             //GET /games
             group.MapGet("/", async (GameStoreContext dbContext) =>
             {
-                var games = await dbContext.Games.ToListAsync();
+                var games = await dbContext.Games
+                .Include(g => g.Genre)
+                //Proyection of Data
+                .Select( g=> new GameSummaryDto(g.Id, g.Name, g.Genre!.Name, g.Price, g.ReleaseDate))
+                .AsNoTracking()
+                .ToListAsync(); 
+
+
                 return games;
             });
 
@@ -87,8 +89,8 @@ public static class GameEndpoints
             group.MapDelete("/{id}", async (int id, GameStoreContext dbContext) =>
             {
              
-             var game = await dbContext.Games.FindAsync(id);
-             if(game is not null) dbContext.Games.Remove(game); 
+             await dbContext.Games.Where( game => game.Id == id)
+             .ExecuteDeleteAsync(); 
 
              await dbContext.SaveChangesAsync();
 

@@ -1,28 +1,28 @@
 GET http://localhost:5202/games
 
 ### 
-GET http://localhost:5202/games/1
+GET http://localhost:5202/games/2
 
 ###
 POST http://localhost:5202/games
 Content-Type: application/json 
 
 {
-    "name":"Hola",
-    "genreId":3,
+    "name":"Super Mario 64",
+    "genreId":4,
     "price":20.00,
     "releaseDate":"2023-10-20"
 } 
 
 ###
-PUT http://localhost:5202/games/1 
+PUT http://localhost:5202/games/5 
 Content-Type: application/json 
 
 {
-    "name":"GTA 5",
+    "name":"Super Mario 64",
     "genreId":3,
-    "price":50.00,
-    "releaseDate":"2023-10-20"
+    "price":30.00,
+    "releaseDate":"1999-10-20"
 } 
 
 ### 
