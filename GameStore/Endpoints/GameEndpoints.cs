@@ -60,7 +60,6 @@ public static class GameEndpoints
 
                 GameDetailsDto gameDetails = new(game.Name,game.GenreId,game.Price, game.ReleaseDate);
 
-                //NEVER EXPOSE THE INTERNAL DETAILS to clients, return the DTO
                 return Results.CreatedAtRoute(GetGameEndpointName, new {id = game.Id},gameDetails);
             });
 

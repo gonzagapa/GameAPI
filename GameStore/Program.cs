@@ -1,7 +1,5 @@
 using GameStore;
-using GameStore.Data;
 using GameStore.Endpoints;
-using GameStore.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
