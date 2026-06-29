@@ -1,6 +1,8 @@
 using GameStore.Data;
 using GameStore.Dtos;
 using GameStore.Models;
+using GameStore.Repository;
+using GameStore.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
 
 namespace GameStore.Endpoints;
@@ -16,24 +18,17 @@ public static class GameEndpoints
             var group = app.MapGroup("/games");
 
             //GET /games
-            group.MapGet("/", async (GameStoreContext dbContext) =>
+            group.MapGet("/", async (IGameRepository repository) =>
             {
-                var games = await dbContext.Games
-                .Include(g => g.Genre)
-                //Proyection of Data
-                .Select( g=> new GameSummaryDto(g.Id, g.Name, g.Genre!.Name, g.Price, g.ReleaseDate))
-                .AsNoTracking()
-                .ToListAsync(); 
-
-
+                var games = await repository.GetAllGamesSummary();
                 return games;
             });
 
             //ALWAYS RETURN A DTO, VOID RETURNING INTERNAL REPRESENTATION
             // GET /games/{id} 
-            group.MapGet("/{id}",async (int id, GameStoreContext dbContext) =>
+            group.MapGet("/{id}",async (int id, IGameRepository repository) =>
             {
-                var game = await dbContext.Games.FindAsync(id);
+                var game = await repository.GetByIdAsync(id);
 
                 if(game is null)
                 {
@@ -45,7 +40,7 @@ public static class GameEndpoints
             }).WithName(GetGameEndpointName);
 
             // POST /games
-            group.MapPost("/",async (CreateGameDto newGame, GameStoreContext dbContext) =>
+            group.MapPost("/",async (CreateGameDto newGame, IGameRepository repository) =>
             {
                 Game game = new()
                 {
@@ -55,18 +50,16 @@ public static class GameEndpoints
                     ReleaseDate = newGame.ReleaseDate
                 } ;
 
-                await dbContext.Games.AddAsync(game);
-                await dbContext.SaveChangesAsync(); 
-
+               await repository.AddAsync(game);
                 GameDetailsDto gameDetails = new(game.Name,game.GenreId,game.Price, game.ReleaseDate);
 
                 return Results.CreatedAtRoute(GetGameEndpointName, new {id = game.Id},gameDetails);
             });
 
             // PUT /games/{id}
-            group.MapPut("/{id}", async (int id, UpdateGameDto updatedGame, GameStoreContext dbContext) =>
+            group.MapPut("/{id}", async (int id, UpdateGameDto updatedGame, IGameRepository repository) =>
             {
-                var games = await dbContext.Games.FindAsync(id);
+                var games = await repository.GetByIdAsync(id);
 
                 if(games is null)
                 {
@@ -79,21 +72,16 @@ public static class GameEndpoints
                games.Price = updatedGame.Price;
 
 
-                await dbContext.SaveChangesAsync();
-
+                await repository.UpdateAsync(games);
                 return Results.NoContent();  
             });
 
             // DELETE /games/{id}
-            group.MapDelete("/{id}", async (int id, GameStoreContext dbContext) =>
+            group.MapDelete("/{id}", async (int id, IGameRepository repository) =>
             {
              
-             await dbContext.Games.Where( game => game.Id == id)
-             .ExecuteDeleteAsync(); 
-
-             await dbContext.SaveChangesAsync();
-
-            return Results.NoContent();
+                await repository.DeleteByIdAsync(id);
+                return Results.NoContent();
             });
     }
 
