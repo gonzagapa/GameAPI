@@ -10,6 +10,8 @@ namespace GameStore.Endpoints;
 public static class GameEndpoints
 {
     const string GetGameEndpointName = "GetGame";
+    const int MAX_PAGE_SIZE = 30;
+    const int MIN_PAGE_SIZE = 5;
 
     //WebApplication is the object to be extended
     public static void MapGamesEndpoints(this WebApplication app)
@@ -18,10 +20,14 @@ public static class GameEndpoints
             var group = app.MapGroup("/games");
 
             //GET /games
-            group.MapGet("/", async (IGameRepository repository) =>
+            // We limit the amount of items to return by 30
+            group.MapGet("/", async (IGameRepository repository, int? pageNumber, int? pageSize) =>
             {
-                var games = await repository.GetAllGamesSummary();
-                return games;
+                pageSize = pageSize > MAX_PAGE_SIZE ? MIN_PAGE_SIZE: pageSize;
+
+                var games = await repository.GetPaginatedOffsetGame(pageNumber ?? 1, pageSize ?? 5);
+                
+                return Results.Ok(games);
             });
 
             //ALWAYS RETURN A DTO, VOID RETURNING INTERNAL REPRESENTATION

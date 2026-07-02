@@ -1,4 +1,7 @@
-GET http://localhost:5202/games
+GET http://localhost:5202/games 
+
+###
+GET http://localhost:5202/games?pageSize=3&pageNumber=2
 
 ### 
 GET http://localhost:5202/games/2

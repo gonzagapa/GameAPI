@@ -21,5 +21,23 @@ namespace GameStore.Repository
                 .AsNoTracking()
                 .ToListAsync(); 
         }
+
+        public async Task<PageResponseOffsetDto<Game>> GetPaginatedOffsetGame(int pageNumber=1, int pageSize=5)
+        {
+            var games =  await _dbContext
+            .Games
+            .OrderBy(g => g.Id)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .AsNoTracking()
+            .ToListAsync();  
+
+            var total = await _dbContext.Games.CountAsync();
+
+            PageResponseOffsetDto<Game> response = new(pageNumber, pageSize,total, games);
+
+            return response;
+
+        }
     }
 }

@@ -1,3 +1,5 @@
+using GameStore.Dtos;
+
 namespace GameStore.Repository.Interface
 {
     public interface IRepository<TEntity> where TEntity: class
