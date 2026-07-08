@@ -3,15 +3,23 @@ using GameStore.Endpoints;
 using GameStore.Repository;
 using GameStore.Repository.Interface;
 using Microsoft.AspNetCore.Diagnostics;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 //Data Validation available in our Dtos
 builder.Services.AddValidation();
+builder.Services.AddOpenApi();
 builder.AddGameStoreDB();
 builder.Services.AddScoped<IGameRepository, GameRepository>();
 
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+}
 
 //Global exceptions handler
 app.UseExceptionHandler(appException =>
@@ -36,5 +44,6 @@ app.UseExceptionHandler(appException =>
 
 app.MapGamesEndpoints();
 app.MapGenreEndpoints();
+app.MapUserEndponts(); 
 app.MigrateDB();
 app.Run();
