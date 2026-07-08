@@ -2,6 +2,8 @@ using GameStore;
 using GameStore.Endpoints;
 using GameStore.Repository;
 using GameStore.Repository.Interface;
+using GameStore.Services;
+using GameStore.Services.Interface;
 using Microsoft.AspNetCore.Diagnostics;
 using Scalar.AspNetCore;
 
@@ -12,6 +14,7 @@ builder.Services.AddValidation();
 builder.Services.AddOpenApi();
 builder.AddGameStoreDB();
 builder.Services.AddScoped<IGameRepository, GameRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
