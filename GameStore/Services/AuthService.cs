@@ -24,7 +24,7 @@ namespace GameStore.Services
         }
         public async Task<string> LoginAsync(UserDto userDto)
         {
-                if(_dbContext.User.Any(user => user.Username != userDto.Username))
+                if(!_dbContext.User.Any(user => user.Username == userDto.Username))
                 {
                     return string.Empty;
                 } 
@@ -63,7 +63,8 @@ namespace GameStore.Services
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Username)
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Role,user.Role)
             }; 
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue<string>("AppSettings:Token") ?? "")); 

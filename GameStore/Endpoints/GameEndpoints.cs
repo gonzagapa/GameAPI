@@ -60,7 +60,7 @@ public static class GameEndpoints
                 GameDetailsDto gameDetails = new(game.Name,game.GenreId,game.Price, game.ReleaseDate);
 
                 return Results.CreatedAtRoute(GetGameEndpointName, new {id = game.Id},gameDetails);
-            });
+            }).RequireAuthorization();
 
             // PUT /games/{id}
             group.MapPut("/{id}", async (int id, UpdateGameDto updatedGame, IGameRepository repository) =>
@@ -80,7 +80,7 @@ public static class GameEndpoints
 
                 await repository.UpdateAsync(games);
                 return Results.NoContent();  
-            });
+            }).RequireAuthorization();
 
             // DELETE /games/{id}
             group.MapDelete("/{id}", async (int id, IGameRepository repository) =>
@@ -88,7 +88,7 @@ public static class GameEndpoints
              
                 await repository.DeleteByIdAsync(id);
                 return Results.NoContent();
-            });
+            }).RequireAuthorization();
     }
 
 

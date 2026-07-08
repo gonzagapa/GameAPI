@@ -21,13 +21,18 @@ namespace GameStore.Endpoints {
                 }
 
                 return Results.Ok(user); 
-            });
+            }).AllowAnonymous();
 
             app.MapPost("/login", async (UserDto userDto, IAuthService authService) =>
             {
                var token = await authService.LoginAsync(userDto);
                return String.IsNullOrEmpty(token) ? Results.BadRequest("User or password isnt correct"): Results.Ok(token);
-            }); 
+            }).AllowAnonymous();
+
+            app.MapGet("/admin-only", () =>
+            {
+                return Results.Ok("you are an admin");
+            }).RequireAuthorization("Admin");
         } 
     }
 }
