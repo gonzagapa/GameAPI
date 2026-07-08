@@ -5,7 +5,7 @@ namespace GameStore.Services.Interface
 {
     public interface IAuthService
     {
-        Task<string> LoginAsync(UserDto userDto);
+        Task<TokenResponseDto?> LoginAsync(UserDto userDto);
 
         Task<User?> RegisterAsync(UserDto userDto);
     }

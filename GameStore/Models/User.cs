@@ -1,3 +1,5 @@
+using System.Security.AccessControl;
+
 namespace GameStore.Models {
     
     public class User
@@ -8,6 +10,10 @@ namespace GameStore.Models {
 
         public string HashPassword { get; set; } = string.Empty; 
 
-        public string Role { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty; 
+
+        public string? RefreshToken { get; set; }
+
+        public DateTime? RefreshTokenExpiryTime { get; set; }
     }
 }

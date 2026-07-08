@@ -25,8 +25,8 @@ namespace GameStore.Endpoints {
 
             app.MapPost("/login", async (UserDto userDto, IAuthService authService) =>
             {
-               var token = await authService.LoginAsync(userDto);
-               return String.IsNullOrEmpty(token) ? Results.BadRequest("User or password isnt correct"): Results.Ok(token);
+               var response = await authService.LoginAsync(userDto);
+               return  response is null ? Results.BadRequest("User or password isnt correct"): Results.Ok(response);
             }).AllowAnonymous();
 
             app.MapGet("/admin-only", () =>

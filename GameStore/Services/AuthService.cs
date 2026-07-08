@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using GameStore.Data;
 using GameStore.Dtos;
@@ -22,23 +23,27 @@ namespace GameStore.Services
             _configuration = configuration;
             
         }
-        public async Task<string> LoginAsync(UserDto userDto)
+        public async Task<TokenResponseDto?> LoginAsync(UserDto userDto)
         {
                 if(!_dbContext.User.Any(user => user.Username == userDto.Username))
                 {
-                    return string.Empty;
+                    return null;
                 } 
 
                 var user = await _dbContext.User.FirstOrDefaultAsync(user => user.Username == userDto.Username);
-                if(user is null) return string.Empty;
+                if(user is null) return null;
 
                 if(new PasswordHasher<User>().VerifyHashedPassword(user, user.HashPassword, userDto.Password) == PasswordVerificationResult.Failed)
                 {
-                   return string.Empty;
+                   return null;
                 }
 
-                string token = CreateToken(user, _configuration); 
-                return token;
+                TokenResponseDto reponse = new(
+                    CreateToken(user), 
+                    await GenerateAndSaveRefreshTokenAsync(user)
+                    );
+                    
+                return reponse;
         }
 
         public async Task<User?> RegisterAsync(UserDto userDto)
@@ -59,7 +64,7 @@ namespace GameStore.Services
             return user;
         } 
 
-        private static string CreateToken(User user, IConfiguration configuration)
+        private  string CreateToken(User user)
         {
             var claims = new List<Claim>
             {
@@ -67,13 +72,13 @@ namespace GameStore.Services
                 new Claim(ClaimTypes.Role,user.Role)
             }; 
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue<string>("AppSettings:Token") ?? "")); 
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetValue<string>("AppSettings:Token") ?? "")); 
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
             
             var tokenDescriptor = new JwtSecurityToken(
-                issuer: configuration.GetValue<string>("AppSettings:Issuer"),
-                audience: configuration.GetValue<string>("AppSettings:Audience"), 
+                issuer: _configuration.GetValue<string>("AppSettings:Issuer"),
+                audience: _configuration.GetValue<string>("AppSettings:Audience"), 
                 claims: claims,
                 expires: DateTime.UtcNow.AddDays(1), 
                 signingCredentials:creds 
@@ -81,6 +86,23 @@ namespace GameStore.Services
 
             return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
 
+        }
+
+        private string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32]; 
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+            return Convert.ToBase64String(randomNumber);
+        }
+
+        private async Task<string> GenerateAndSaveRefreshTokenAsync(User user)
+        {
+            var refreshToken = GenerateRefreshToken(); 
+            user.RefreshToken = refreshToken; 
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); 
+            await UpdateAsync(user);
+            return refreshToken;
         }
     }
 }
