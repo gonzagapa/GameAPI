@@ -57,7 +57,7 @@ yarn-error.log
 
 # Local app settings files
 appsettings.local.json
-appsettings.Devlopment.json
+appsettings.Development.json
 /GameStore/bin/
 /GameStore/obj/
 
