@@ -68,8 +68,12 @@ app.UseExceptionHandler(appException =>
    }) ;
 });
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapGamesEndpoints();
 app.MapGenreEndpoints();
 app.MapUserEndponts(); 
-app.MigrateDB();
+app.MigrateDB(); 
+
 app.Run();

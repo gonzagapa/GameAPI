@@ -1,4 +1,5 @@
 using GameStore.Dtos;
+using GameStore.Mapping;
 using GameStore.Services.Interface;
 
 namespace GameStore.Endpoints {
@@ -14,7 +15,7 @@ namespace GameStore.Endpoints {
                     return Results.BadRequest("User exist");
                 }
 
-                return Results.Ok(user); 
+                return Results.Ok(user.MappingRegisterDto()); 
             }).AllowAnonymous();
 
             app.MapPost("/login", async (UserDto userDto, IAuthService authService) =>
