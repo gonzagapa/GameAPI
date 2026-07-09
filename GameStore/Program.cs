@@ -20,6 +20,9 @@ builder.AddGameStoreDB();
 builder.Services.AddScoped<IGameRepository, GameRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+//Register in-memory caching service for caching data in RAM
+builder.Services.AddMemoryCache();
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 .AddJwtBearer(opt =>
 {

@@ -10,6 +10,7 @@ public static class GenreEndpoints
     {
         var group = app.MapGroup("/genre"); 
 
+        //TODO: implement in-memory cache: https://dotnettutorials.net/lesson/how-to-implement-in-memory-caching-in-asp-net-core-web-api/
         //GET /genre
         group.MapGet("/",async(GameStoreContext dbContext)=> 
             await dbContext.Genres
