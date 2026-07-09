@@ -65,7 +65,8 @@ namespace GameStore.Services
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role,user.Role)
+                new Claim(ClaimTypes.Role,user.Role),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             }; 
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.GetValue<string>("AppSettings:Token") ?? "")); 
@@ -76,7 +77,7 @@ namespace GameStore.Services
                 issuer: _configuration.GetValue<string>("AppSettings:Issuer"),
                 audience: _configuration.GetValue<string>("AppSettings:Audience"), 
                 claims: claims,
-                expires: DateTime.UtcNow.AddDays(1), 
+                expires: DateTime.UtcNow.AddHours(1), 
                 signingCredentials:creds 
             ); 
 
@@ -126,6 +127,18 @@ namespace GameStore.Services
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); 
             await UpdateAsync(user);
             return refreshToken;
+        }
+
+        public async Task<string?> LogoutAsync(int userId)
+        {
+            var user = await GetByIdAsync(userId);
+            if(user is null) return null;
+
+            user.RefreshToken = null; 
+            user.RefreshTokenExpiryTime = null;
+
+            await UpdateAsync(user);
+            return "User logout";
         }
     }
 }

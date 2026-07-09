@@ -70,6 +70,7 @@ app.UseExceptionHandler(appException =>
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseHttpsRedirection();
 
 app.MapGamesEndpoints();
 app.MapGenreEndpoints();
