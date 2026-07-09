@@ -1,11 +1,5 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using GameStore.Dtos;
-using GameStore.Models;
 using GameStore.Services.Interface;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
 
 namespace GameStore.Endpoints {
     public static class UserEndponts
@@ -33,6 +27,16 @@ namespace GameStore.Endpoints {
             {
                 return Results.Ok("you are an admin");
             }).RequireAuthorization("Admin");
+
+            app.MapPost("/refresh-token", async (RefreshTokenDto request, IAuthService authService) =>
+            {
+                var response =  await authService.RefreshTokenAsync(request); 
+                if(response is null)
+                {
+                    return Results.BadRequest("Your refresh token is still valid or your reques body is wrong ");
+                } 
+                return Results.Ok(response); 
+            });
         } 
     }
 }

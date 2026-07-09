@@ -38,12 +38,8 @@ namespace GameStore.Services
                    return null;
                 }
 
-                TokenResponseDto reponse = new(
-                    CreateToken(user), 
-                    await GenerateAndSaveRefreshTokenAsync(user)
-                    );
-                    
-                return reponse;
+                TokenResponseDto response = await CreateTokenResponse(user);
+                return response;
         }
 
         public async Task<User?> RegisterAsync(UserDto userDto)
@@ -94,6 +90,33 @@ namespace GameStore.Services
             using var rng = RandomNumberGenerator.Create();
             rng.GetBytes(randomNumber);
             return Convert.ToBase64String(randomNumber);
+        } 
+
+        public async Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenDto request)
+        {
+            var user = await ValidateRefreshToken(request.UserId, request.RefreshToken);
+            if (user is null) return null;
+            TokenResponseDto response = await CreateTokenResponse(user);
+
+            return response;
+        }
+
+        private async Task<TokenResponseDto> CreateTokenResponse(User user)
+        {
+            return new(
+                    CreateToken(user),
+                    await GenerateAndSaveRefreshTokenAsync(user)
+                    );
+        }
+
+        private async Task<User?> ValidateRefreshToken(int idUser, string refreshToken)
+        {
+            var user = await _dbContext.User.FindAsync(idUser);
+            if(user is null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            {
+                return null;
+            }
+            return user;
         }
 
         private async Task<string> GenerateAndSaveRefreshTokenAsync(User user)

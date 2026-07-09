@@ -8,5 +8,7 @@ namespace GameStore.Services.Interface
         Task<TokenResponseDto?> LoginAsync(UserDto userDto);
 
         Task<User?> RegisterAsync(UserDto userDto);
+
+        Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenDto request);
     }
 }
