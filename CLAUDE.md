@@ -34,17 +34,19 @@ HTTP Request → Endpoint (MapXxxEndpoints) → Repository or Service → EF Cor
 
 - **Endpoints** (`Endpoints/`) — Minimal API route definitions registered as extension methods on `WebApplication`. Each file groups a resource: `GameEndpoints`, `GenreEndpoints`, `UserEndpoints`.
 - **Repository** (`Repository/`) — Generic `Repository<T>` base class handles CRUD. `GameRepository` extends it with game-specific queries (pagination, summary projection). `AuthService` also inherits from `Repository<User>`.
-- **Services** (`Services/AuthService.cs`) — Auth logic: register, login, refresh token. Issues JWT access tokens (1-day expiry) and random refresh tokens (7-day expiry) stored in the User table.
+- **Services** (`Services/AuthService.cs`) — Auth logic: register, login, refresh token, logout. Issues JWT access tokens (1-hour expiry) and random refresh tokens (7-day expiry) stored in the User table.
 - **Data** (`Data/`) — `GameStoreContext` (EF DbContext) and `DataExtension` (registers SQLite, seeds genres/games, runs migrations on startup via `app.MigrateDB()`).
-- **DTOs** (`Dtos/`) — Record types for all request/response shapes. Never expose `Models` directly from endpoints.
+- **DTOs** (`Dtos/`) — Record types for all request/response shapes. Never expose `Models` directly from endpoints. `UserRegisterDto` is mapped from `User` via the `MappingRegisterDto()` extension (`Mapping/UserMapping.cs`) so `/register` never returns the password hash.
 
 ### Auth flow
 
-1. `POST /register` / `POST /login` → returns `TokenResponseDto` (`{ accessToken, refreshToken }`)
-2. Access token is a signed JWT (HS512) with `Name` + `Role` claims, valid 1 day
+1. `POST /register` → returns `UserRegisterDto` (`{ username, createdAt }`); `POST /login` → returns `TokenResponseDto` (`{ accessToken, refreshToken }`)
+2. Access token is a signed JWT (HS512) with `Name`, `Role`, and `NameIdentifier` (user id) claims, valid 1 hour
 3. `POST /refresh-token` with `{ userId, refreshToken }` → issues a new token pair
-4. Write endpoints (`POST/PUT/DELETE /games`) require `RequireAuthorization()`
-5. `GET /admin-only` requires the `"Admin"` policy (role = `"Admin"`)
+4. `POST /logout` (requires auth) → reads the user id from the `NameIdentifier` claim and clears the stored refresh token, invalidating it
+5. Write endpoints (`POST/PUT/DELETE /games`) require `RequireAuthorization()`
+6. `GET /admin-only` requires the `"Admin"` policy (role = `"Admin"`)
+7. `app.UseAuthentication()` must run before `app.UseAuthorization()` in `Program.cs` — reversing this order breaks claims resolution (`ClaimsPrincipal` in endpoints)
 
 ### Configuration
 
