@@ -1,10 +1,12 @@
 using GameStore.Data;
+using GameStore.Dtos;
+using GameStore.Models;
 using GameStore.Repository.Interface;
 using Microsoft.EntityFrameworkCore;
 
 namespace GameStore.Repository
 {
-    public class Repository<T> : IRepository<T> where T : class
+    public class Repository<T> : IRepository<T> where T : class, IEntity
     {
         protected readonly GameStoreContext _dbContext;
         private readonly DbSet<T> _dbSet;
@@ -44,6 +46,23 @@ namespace GameStore.Repository
         {
             _dbSet.Update(entity);
             await _dbContext.SaveChangesAsync();
+        } 
+
+        public async Task<PageResponseOffsetDto<T>> GetPaginatedOffsetEntity(int pageNumber=1, int pageSize=5)
+        {
+            var entitiesPaginated =  await _dbSet
+            .OrderBy(g => g.Id)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .AsNoTracking()
+            .ToListAsync();  
+
+            var total = await _dbContext.Games.CountAsync();
+
+            PageResponseOffsetDto<T> response = new(pageNumber, pageSize,total, entitiesPaginated);
+
+            return response;
+
         }
     }
 }

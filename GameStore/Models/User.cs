@@ -2,7 +2,7 @@ using System.Security.AccessControl;
 
 namespace GameStore.Models {
     
-    public class User
+    public class User:IEntity
     {
         public int Id { get; set; }
 

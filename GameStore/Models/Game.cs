@@ -1,6 +1,6 @@
 namespace GameStore.Models;
 
-public class Game
+public class Game : IEntity
 {
     public int Id { get; set; }
 

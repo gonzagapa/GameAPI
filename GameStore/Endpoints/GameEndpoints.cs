@@ -25,7 +25,7 @@ public static class GameEndpoints
             {
                 pageSize = pageSize > MAX_PAGE_SIZE ? MIN_PAGE_SIZE: pageSize;
 
-                var games = await repository.GetPaginatedOffsetGame(pageNumber ?? 1, pageSize ?? 5);
+                var games = await repository.GetPaginatedOffsetEntity(pageNumber ?? 1, pageSize ?? 5);
                 
                 return Results.Ok(games);
             });
