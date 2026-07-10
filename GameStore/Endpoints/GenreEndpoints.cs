@@ -1,6 +1,8 @@
 using GameStore.Data;
 using GameStore.Dtos;
+using GameStore.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace GameStore.Endpoints;
 
@@ -12,11 +14,22 @@ public static class GenreEndpoints
 
         //TODO: implement in-memory cache: https://dotnettutorials.net/lesson/how-to-implement-in-memory-caching-in-asp-net-core-web-api/
         //GET /genre
-        group.MapGet("/",async(GameStoreContext dbContext)=> 
-            await dbContext.Genres
-            .Select(genre => new GenreDto(genre.Id,genre.Name))
-            .AsNoTracking()
-            .ToListAsync()
-        );
+        group.MapGet("/",async(GameStoreContext dbContext, IMemoryCache _cache)=>
+        {
+            var cacheKey = "/genre";
+            if(!_cache.TryGetValue(cacheKey, out List<GenreDto>? genrers))
+            {
+                genrers = await dbContext.Genres.Select(genre => new GenreDto(genre.Id,genre.Name))
+                .AsNoTracking()
+                .ToListAsync();
+
+                //configure absolute expiration: expires after fixed time
+                var cacheEntryOption = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
+                _cache.Set(cacheKey, genrers, cacheEntryOption);
+            }
+             return genrers;   
+            
+        }
+        ).RequireAuthorization();
     }
 }
