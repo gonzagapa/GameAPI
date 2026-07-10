@@ -51,13 +51,13 @@ namespace GameStore.Repository
         public async Task<PageResponseOffsetDto<T>> GetPaginatedOffsetEntity(int pageNumber=1, int pageSize=5)
         {
             var entitiesPaginated =  await _dbSet
-            .OrderBy(g => g.Id)
+            .OrderBy(entity => entity.Id)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .AsNoTracking()
             .ToListAsync();  
 
-            var total = await _dbContext.Games.CountAsync();
+            var total = await _dbSet.CountAsync();
 
             PageResponseOffsetDto<T> response = new(pageNumber, pageSize,total, entitiesPaginated);
 

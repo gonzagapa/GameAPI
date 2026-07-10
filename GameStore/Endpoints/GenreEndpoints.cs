@@ -12,7 +12,6 @@ public static class GenreEndpoints
     {
         var group = app.MapGroup("/genre"); 
 
-        //TODO: implement in-memory cache: https://dotnettutorials.net/lesson/how-to-implement-in-memory-caching-in-asp-net-core-web-api/
         //GET /genre
         group.MapGet("/",async(GameStoreContext dbContext, IMemoryCache _cache)=>
         {
@@ -23,6 +22,7 @@ public static class GenreEndpoints
                 .AsNoTracking()
                 .ToListAsync();
 
+    
                 //configure absolute expiration: expires after fixed time
                 var cacheEntryOption = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
                 _cache.Set(cacheKey, genrers, cacheEntryOption);
