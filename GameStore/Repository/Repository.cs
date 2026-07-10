@@ -50,6 +50,7 @@ namespace GameStore.Repository
 
         public async Task<PageResponseOffsetDto<T>> GetPaginatedOffsetEntity(int pageNumber=1, int pageSize=5)
         {
+
             var entitiesPaginated =  await _dbSet
             .OrderBy(entity => entity.Id)
             .Skip((pageNumber - 1) * pageSize)
