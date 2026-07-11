@@ -4,6 +4,7 @@ using GameStore.Mapping;
 using GameStore.Models;
 using GameStore.Repository;
 using GameStore.Repository.Interface;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
 namespace GameStore.Endpoints;
@@ -20,31 +21,37 @@ public static class GameEndpoints
 
             //GET /games
             // We limit the amount of items to return by 30
-            group.MapGet("/", async (IGameRepository repository, PaginationParamsDto pagination) =>
+            group.MapGet("/", async Task<Ok<PageResponseOffsetDto<Game>>> (
+                IGameRepository repository,
+                PaginationParamsDto pagination) =>
             {
+                //TODO: Try GetPaginatedOffset return a DTO, not the entinty
                 var games = await repository.GetPaginatedOffsetEntity(pagination.PageNumber, pagination.PageSize);
-                
-                return Results.Ok(games);
+
+                return TypedResults.Ok(games);
             });
 
-            //ALWAYS RETURN A DTO, VOID RETURNING INTERNAL REPRESENTATION
-            // GET /games/{id} 
-            group.MapGet("/{id}",async (int id, IGameRepository repository) =>
+            // GET /games/{id:int} -> route constraint 
+            group.MapGet("/{id:int}",async  Task<Results<Ok<GameDetailsDto>, NotFound>> (
+                int id, 
+                IGameRepository repository) =>
             {
                 var game = await repository.GetByIdAsync(id);
 
                 if(game is null)
                 {
-                    return Results.NotFound();
+                    return TypedResults.NotFound();
                 }
                 GameDetailsDto gameDetails = game.MapGameDetailsDto();
-                return Results.Ok(gameDetails); 
+                return TypedResults.Ok(gameDetails); 
 
             }).WithName(GetGameEndpointName);
 
             // POST /games
             //TODO: Implementar filtros con IEndpointFilter
-            group.MapPost("/",async (CreateGameDto newGame, IGameRepository repository) =>
+            group.MapPost("/",async Task<CreatedAtRoute<GameDetailsDto>> (
+                CreateGameDto newGame, 
+                IGameRepository repository) =>
             {
                 Game game = new()
                 {
@@ -58,18 +65,21 @@ public static class GameEndpoints
                 
                 var dto = game.MapGameDetailsDto();
 
-                return Results.CreatedAtRoute(GetGameEndpointName, new {id = game.Id},dto);
+                return TypedResults.CreatedAtRoute(dto, GetGameEndpointName, new { id = game.Id });
             }).RequireAuthorization();
 
             // PUT /games/{id}
              //TODO: Implementar filtros con IEndpointFilter
-            group.MapPut("/{id}", async (int id, UpdateGameDto updatedGame, IGameRepository repository) =>
+            group.MapPut("/{id:int}", async Task<Results<NotFound,NoContent>> (
+                int id, 
+                UpdateGameDto updatedGame, 
+                IGameRepository repository) =>
             {
                 var games = await repository.GetByIdAsync(id);
 
                 if(games is null)
                 {
-                    return Results.NotFound();
+                    return TypedResults.NotFound();
                 }
 
                games.GenreId = updatedGame.GenreId; 
@@ -79,15 +89,16 @@ public static class GameEndpoints
 
 
                 await repository.UpdateAsync(games);
-                return Results.NoContent();  
+                return TypedResults.NoContent();  
             }).RequireAuthorization();
 
             // DELETE /games/{id}
-            group.MapDelete("/{id}", async (int id, IGameRepository repository) =>
+            group.MapDelete("/{id:int}", async Task<NoContent> (
+                int id, IGameRepository repository) =>
             {
              
                 await repository.DeleteByIdAsync(id);
-                return Results.NoContent();
+                return TypedResults.NoContent();
             }).RequireAuthorization();
     }
 

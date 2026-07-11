@@ -42,11 +42,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorizationBuilder()
 .AddPolicy("Admin", policy => policy.RequireRole("Admin"));
 
+
+//builds a app instances
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.MapOpenApi(); //expose the generated OpenAPi document
     app.MapScalarApiReference();
 }
 
