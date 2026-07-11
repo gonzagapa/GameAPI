@@ -1,5 +1,6 @@
 using GameStore.Data;
 using GameStore.Dtos;
+using GameStore.Mapping;
 using GameStore.Models;
 using GameStore.Repository;
 using GameStore.Repository.Interface;
@@ -36,7 +37,7 @@ public static class GameEndpoints
                 {
                     return Results.NotFound();
                 }
-                GameDetailsDto gameDetails = new(game.Name,game.GenreId,game.Price, game.ReleaseDate);
+                GameDetailsDto gameDetails = game.MapGameDetailsDto();
                 return Results.Ok(gameDetails); 
 
             }).WithName(GetGameEndpointName);
@@ -54,9 +55,10 @@ public static class GameEndpoints
                 } ;
 
                await repository.AddAsync(game);
-                GameDetailsDto gameDetails = new(game.Name,game.GenreId,game.Price, game.ReleaseDate);
+                
+                var dto = game.MapGameDetailsDto();
 
-                return Results.CreatedAtRoute(GetGameEndpointName, new {id = game.Id},gameDetails);
+                return Results.CreatedAtRoute(GetGameEndpointName, new {id = game.Id},dto);
             }).RequireAuthorization();
 
             // PUT /games/{id}
