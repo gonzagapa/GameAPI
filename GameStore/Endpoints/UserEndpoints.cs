@@ -9,7 +9,9 @@ namespace GameStore.Endpoints {
     {
         public static void MapUserEndponts(this WebApplication app)
         {
-            app.MapPost("/register", 
+            var group = app.MapGroup("/auth").WithTags("Auth"); 
+
+            group.MapPost("/register", 
             async Task<Results<BadRequest<string>,Ok<UserRegisterDto> >> 
             (UserDto userDto, IAuthService authService) =>
             {
@@ -23,7 +25,7 @@ namespace GameStore.Endpoints {
 
             }).AllowAnonymous();
 
-            app.MapPost("/login", 
+            group.MapPost("/login", 
             async Task<Results<BadRequest<string>, Ok<TokenResponseDto> > >
             (UserDto userDto, IAuthService authService) =>
             {
@@ -38,7 +40,7 @@ namespace GameStore.Endpoints {
             //     return Results.Ok("you are an admin");
             // }).RequireAuthorization("Admin");
 
-            app.MapPost("/refresh-token", 
+            group.MapPost("/refresh-token", 
             async  Task<Results<BadRequest<string>, Ok<TokenResponseDto> > >
             (RefreshTokenDto request, IAuthService authService) =>
             {
@@ -52,7 +54,7 @@ namespace GameStore.Endpoints {
 
 
 
-            app.MapPost("/logout", 
+            group.MapPost("/logout", 
             async Task<Results<BadRequest<string>, NoContent>>
             (ClaimsPrincipal user, IAuthService authService) =>
             {

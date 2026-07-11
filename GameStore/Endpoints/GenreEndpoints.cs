@@ -11,7 +11,7 @@ public static class GenreEndpoints
 {
     public static void MapGenreEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("/genre"); 
+        var group = app.MapGroup("/genre").WithTags("Genre"); 
 
         //GET /genre
         group.MapGet("/",async Task<Ok<List<GenreDto>>> (GameStoreContext dbContext, IMemoryCache _cache)=>

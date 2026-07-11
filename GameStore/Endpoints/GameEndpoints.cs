@@ -17,7 +17,7 @@ public static class GameEndpoints
     public static void MapGamesEndpoints(this WebApplication app)
     {
             //Grouping paths with a fixed prefix
-            var group = app.MapGroup("/games");
+            var group = app.MapGroup("/games").WithTags("Games");
 
             //GET /games
             // We limit the amount of items to return by 30
