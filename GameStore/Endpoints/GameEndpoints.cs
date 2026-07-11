@@ -25,7 +25,7 @@ public static class GameEndpoints
                 IGameRepository repository,
                 PaginationParamsDto pagination) =>
             {
-                //TODO: Try GetPaginatedOffset return a DTO, not the entinty
+                
                 var games = await repository.GetPaginatedOffsetEntity(pagination.PageNumber, pagination.PageSize);
 
                 return TypedResults.Ok(games);
@@ -48,7 +48,6 @@ public static class GameEndpoints
             }).WithName(GetGameEndpointName);
 
             // POST /games
-            //TODO: Implementar filtros con IEndpointFilter
             group.MapPost("/",async Task<CreatedAtRoute<GameDetailsDto>> (
                 CreateGameDto newGame, 
                 IGameRepository repository) =>
@@ -69,7 +68,6 @@ public static class GameEndpoints
             }).RequireAuthorization();
 
             // PUT /games/{id}
-             //TODO: Implementar filtros con IEndpointFilter
             group.MapPut("/{id:int}", async Task<Results<NotFound,NoContent>> (
                 int id, 
                 UpdateGameDto updatedGame, 
