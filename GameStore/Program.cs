@@ -73,9 +73,12 @@ app.UseExceptionHandler(appException =>
    }) ;
 });
 
+app.MapGet("/", () => "Hello World!");
+
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseHttpsRedirection();
+app.UseHttpsRedirection(); 
+
 
 app.MapGamesEndpoints();
 app.MapGenreEndpoints();
@@ -83,3 +86,5 @@ app.MapUserEndponts();
 app.MigrateDB(); 
 
 app.Run();
+
+public partial class Program { }
