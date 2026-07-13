@@ -5,7 +5,7 @@ namespace GameStore.Test;
 public class GameEndpointTest
 {
     [Fact]
-    public async Task Should_get_all_games_paginated()
+    public async Task Should_get_hello_world()
     {
         await using var application = new WebApplicationFactory<Program>();
         using var client = application.CreateClient(); 
@@ -13,5 +13,11 @@ public class GameEndpointTest
         var response = await client.GetStringAsync("/");
 
         Assert.Equal("Hello World!", response);
+    }
+
+    [Fact]
+    public async Task Should_get_games_paginated()
+    {
+        
     }
 }
