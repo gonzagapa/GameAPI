@@ -73,26 +73,16 @@ namespace GameStore.Test.Services
             Assert.False(string.IsNullOrWhiteSpace(response.RefreshToken));
         } 
 
-        [Fact]
-
-        public async Task LoginAsync_should_return_null_with_invalid_password()
+        [Theory]
+        [InlineData("gonzalo", "WrongPassword123!")]
+        [InlineData("juanes", "MyPassword123!")]
+        public async Task LoginAsync_should_return_null_with_invalid_userDto(string username, string password)
         {
-             using var context = CreateContext(); 
+             using var context = CreateContext();
             var service = new AuthService(CreateConfiguration(), context);
             await service.RegisterAsync(new UserDto("gonzalo", "MyPassword123!"));
 
-            var response = await service.LoginAsync(new UserDto("gonzalo", "MyPassword124!")); 
-            Assert.Null(response);
-        }
-
-        [Fact]
-        public async Task LoginAsync_should_return_null_when_user_doesnt_exist()
-        {
-            using var context = CreateContext(); 
-            var service = new AuthService(CreateConfiguration(), context);
-            await service.RegisterAsync(new UserDto("gonzalo", "MyPassword123!")); 
-
-            var response = await service.LoginAsync(new UserDto("juanes", "MyPassword123!")); 
+            var response = await service.LoginAsync(new UserDto(username, password));
             Assert.Null(response);
         }
         
