@@ -60,6 +60,27 @@ namespace GameStore.Services
             return user;
         } 
 
+        public async Task<string?> LogoutAsync(int userId)
+        {
+            var user = await GetByIdAsync(userId);
+            if(user is null) return null;
+
+            user.RefreshToken = null; 
+            user.RefreshTokenExpiryTime = null;
+
+            await UpdateAsync(user);
+            return "User logout";
+        } 
+
+        public async Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenDto request)
+        {
+            var user = await ValidateRefreshToken(request.UserId, request.RefreshToken);
+            if (user is null) return null;
+            TokenResponseDto response = await CreateTokenResponse(user);
+
+            return response;
+        }
+        
         private  string CreateToken(User user)
         {
             var claims = new List<Claim>
@@ -93,15 +114,6 @@ namespace GameStore.Services
             return Convert.ToBase64String(randomNumber);
         } 
 
-        public async Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenDto request)
-        {
-            var user = await ValidateRefreshToken(request.UserId, request.RefreshToken);
-            if (user is null) return null;
-            TokenResponseDto response = await CreateTokenResponse(user);
-
-            return response;
-        }
-
         private async Task<TokenResponseDto> CreateTokenResponse(User user)
         {
             return new(
@@ -127,18 +139,6 @@ namespace GameStore.Services
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7); 
             await UpdateAsync(user);
             return refreshToken;
-        }
-
-        public async Task<string?> LogoutAsync(int userId)
-        {
-            var user = await GetByIdAsync(userId);
-            if(user is null) return null;
-
-            user.RefreshToken = null; 
-            user.RefreshTokenExpiryTime = null;
-
-            await UpdateAsync(user);
-            return "User logout";
         }
     }
 }
