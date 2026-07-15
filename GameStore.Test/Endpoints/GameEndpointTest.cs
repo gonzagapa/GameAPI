@@ -14,10 +14,4 @@ public class GameEndpointTest
 
         Assert.Equal("Hello World!", response);
     }
-
-    [Fact]
-    public async Task Should_get_games_paginated()
-    {
-        
-    }
 }
